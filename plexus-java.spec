@@ -59,9 +59,15 @@ def ensure(name, text, after):
 
 ensure("groupId", "org.codehaus.plexus", ("modelVersion",))
 ensure("version", "%{version}", ("artifactId", "groupId", "modelVersion"))
+# JDK 9+ activates a profile that compiles module-info.java. That
+# descriptor requires the ASM jar as the module org.objectweb.asm, and
+# the system jar is not that module. The classpath classes are enough.
+for node in list(root):
+    if local(node.tag) == "profiles":
+        root.remove(node)
 tree.write("pom.xml", encoding="utf-8", xml_declaration=True)
 PY
-rm -rf plexus-java
+rm -rf src/main/java9 plexus-java
 
 %files -f .mfiles
 %doc README.md
